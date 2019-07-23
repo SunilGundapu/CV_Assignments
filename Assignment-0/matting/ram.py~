@@ -1,0 +1,70 @@
+import cv2, os
+import numpy as np
+import argparse
+from os.path import isfile, join
+
+ap = argparse.ArgumentParser()
+ap.add_argument("-ext", "--extension", required=False, default='jpg', help="extension name. default is 'jpg'.")
+ap.add_argument("-o", "--output", required=False, default='Created_Video_Composited.avi', help="output video file")
+args = vars(ap.parse_args())
+
+ext = args['extension']
+output = args['output']
+
+dir_path1 = 'fore1'
+dir_path2 = 'back1'
+
+def Creating_Video():
+
+    files1 = []
+    for img in os.listdir(dir_path1):
+        if img.endswith(ext):
+            files1.append(img)
+		    
+    files2 = []
+    for img in os.listdir(dir_path2):
+        if img.endswith(ext):
+            files2.append(img)
+		    
+    files1.sort(key = lambda x: int(x[5:-4]))
+    files2.sort(key = lambda x: int(x[5:-4]))
+    
+    image_path = os.path.join(dir_path1, files1[0])
+    frame = cv2.imread(image_path)
+    cv2.imshow('video',frame)
+    height, width, channels = frame.shape
+
+    new_images=[]
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v') 
+    out = cv2.VideoWriter(output, fourcc, 25.0, (width, height))
+
+    for i in range(len(files1)):
+        new_frame = []
+        image_path = os.path.join(dir_path1, files1[i])
+        frame1 = cv2.imread(image_path,cv2.IMREAD_COLOR)
+
+        image_path2 = os.path.join(dir_path2, files2[i])
+        frame2 = cv2.imread(image_path2,cv2.IMREAD_COLOR)
+        for j in range(height):
+            new_cl = []
+            for k in range(width):
+                temp=frame1[i,j,:]
+                alpha=(((temp[0]/255.0) +(temp[2]/255.0))-(temp[1]/255.0))
+                if(alpha<=0):
+                    new_cl.append(frame2[i,j,:])
+                else:
+                    new_cl.append(frame1[i,j,:])
+
+            new_frame.append(new_cl)
+        new_frame=np.array(new_frame)
+        print(type(new_frame),new_frame.shape,new_frame)
+        print("\n")
+        out.write(new_frame)
+
+        print("new_frame: ",len(new_frame),np.array(new_frame).shape)
+		#exit()
+        out.release()
+        cv2.destroyAllWindows()
+        print("The output video is {}".format(output))
+
+Creating_Video()

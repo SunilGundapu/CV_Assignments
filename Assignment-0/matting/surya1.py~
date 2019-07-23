@@ -1,0 +1,37 @@
+import cv2, os
+import numpy as np
+
+ 
+dir_path = 'fore1'
+dir_path2 = 'back1'
+
+def Extracting_Images():
+    out = cv2.VideoCapture('f.mp4')
+    frame_count = 1
+    while(True):
+        retur, frame = out.read() 
+        file_name = './fore1/frame' + str(frame_count) + '.jpg' 
+        if(frame_count<=100):
+            cv2.imwrite(file_name, frame) 
+            print (file_name + ' ...Created')
+            frame_count += 1
+        else:
+            break
+
+    out = cv2.VideoCapture('b.mp4')
+    frame_count = 1
+    while(True):
+        retur, frame = out.read() 
+        file_name = './back1/frame' + str(frame_count) + '.jpg' 
+        if(frame_count<=100):
+            cv2.imwrite(file_name, frame) 
+            print (file_name + ' ...Created')
+            frame_count += 1
+        else:
+            break
+
+    out.release() 
+    cv2.destroyAllWindows()
+
+
+Extracting_Images()
